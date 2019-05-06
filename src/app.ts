@@ -9,7 +9,9 @@ let rabbitClient : rabbitmq.Connection;
 let rabbitExchange : rabbitmq.Exchange;
 
 let config : Config;
-let watchJob = new CronJob("*/5 * * * * *", CheckShardsAsync);
+
+// Check shards every minute.
+let watchJob = new CronJob("* */1 * * * *", CheckShardsAsync);
 
 let HashGetAllAsync;
 
