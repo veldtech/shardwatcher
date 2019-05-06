@@ -4,10 +4,12 @@ import {promisify} from 'util';
 const readFile = promisify(fs.readFile);
 
 export interface Config {
-
+    redisUrl : string,
+    amqpUrl : string
 }
 
 export async function LoadConfigAsync(file: string): Promise<Config> {
     let jsonBuffer = await readFile(file);
-    return jsonBuffer.toJSON();
+    console.log(jsonBuffer.toString());
+    return JSON.parse(jsonBuffer.toString()) as Config;
 }

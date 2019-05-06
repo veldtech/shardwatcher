@@ -1,19 +1,45 @@
 import * as redis from "redis";
 import {CronJob} from "cron";
 import * as rabbitmq from "amqp-ts";
-import {Config, LoadConfig} from "./config"
+import {Config, LoadConfigAsync} from "./config"
+import { promisify } from "util";
 
-const config : Config = await LoadConfigAsync("./config.json");
+let redisClient : redis.RedisClient;
+let rabbitClient : rabbitmq.Connection;
+let rabbitExchange : rabbitmq.Exchange;
 
-let watchJob : CronJob;
+let config : Config;
+let watchJob = new CronJob("*/5 * * * * *", CheckShardsAsync);
+
+let HashGetAllAsync;
 
 async function MainAsync() {
+    config = await LoadConfigAsync("./config.json");
+    redisClient = redis.createClient(config.redisUrl);
+    HashGetAllAsync = promisify(redisClient.HGETALL);
 
-
+    rabbitClient = new rabbitmq.Connection(config.amqpUrl);
+    rabbitExchange = rabbitClient.declareExchange("gateway-command", "fanout");
+    watchJob.start();
 }
 
+async function CheckShardsAsync() {
+    let allShards = await HashGetAllAsync("gateway:shards");
+    for(let v in allShards)
+    {
+        if(allShards[v] == "0")
+        {
+            rabbitExchange.publish(JSON.stringify({
+                shard_id: v,
+                type: "reconnect"
+            }));
+            await WaitAsync(5000);
+        }
+    }
+}
 
-new CronJob("*/5 * * * * *",
-    () => {
+async function WaitAsync(ms : number) {
+    await new Promise(resolve => setTimeout(resolve, ms));
+}
 
-    }).start();
+MainAsync();

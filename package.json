@@ -1,0 +1,26 @@
+{
+  "name": "shardwatcher",
+  "version": "0.1.0",
+  "description": "Shard watchdog for Miki's gateway",
+  "main": "src/app.js",
+  "dependencies": {
+    "amqp-ts": "^1.4.0",
+    "cron": "^1.7.1",
+    "redis": "^2.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "app": "tsc && node dist/app.js",
+    "test": "tsc && node dist/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mikibot/shardwatcher.git"
+  },
+  "author": "velddev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mikibot/shardwatcher/issues"
+  },
+  "homepage": "https://github.com/Mikibot/shardwatcher#readme"
+}
