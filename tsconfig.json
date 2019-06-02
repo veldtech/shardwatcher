@@ -1,8 +1,10 @@
 {
     "compilerOptions": {
+        "lib": ["es2015"],
         "allowUnreachableCode": false,
         "noUnusedLocals": true,
         "outDir": "./dist",
         "removeComments": true,
     },
+    "include": ["src"]
 }

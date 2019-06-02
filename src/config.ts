@@ -3,8 +3,13 @@ import {promisify} from 'util';
 
 const readFile = promisify(fs.readFile);
 
+export interface RedisConfig {
+    url : string,
+    password : string
+}
+
 export interface Config {
-    redisUrl : string,
+    redis : RedisConfig,
     amqpUrl : string
 }
 

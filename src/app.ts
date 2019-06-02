@@ -11,17 +11,33 @@ let rabbitExchange : rabbitmq.Exchange;
 let config : Config;
 
 // Check shards every minute.
-let watchJob = new CronJob("* */1 * * * *", CheckShardsAsync);
+let watchJob = new CronJob("* 0 * * * *", CheckShardsAsync);
 
 let HashGetAllAsync;
+let AuthenticateAsync;
 
-async function MainAsync() {
+async function MainAsync(): Promise<void> {
     config = await LoadConfigAsync("./config.json");
-    redisClient = redis.createClient(config.redisUrl);
-    HashGetAllAsync = promisify(redisClient.HGETALL);
 
+    console.log("setting up redis");
+    redisClient = redis.createClient(config.redis.url);
+
+    // Set bindings for async/await
+    HashGetAllAsync = promisify(redisClient.HGETALL)
+        .bind(redisClient);
+    AuthenticateAsync = promisify(redisClient.AUTH)
+        .bind(redisClient);
+
+    if(config.redis.password)
+    {
+        await AuthenticateAsync(config.redis.password);
+    }
+
+    console.log("setting up rabbitmq");
     rabbitClient = new rabbitmq.Connection(config.amqpUrl);
     rabbitExchange = rabbitClient.declareExchange("gateway-command", "fanout");
+
+    console.log("starting watch job");
     watchJob.start();
 }
 
@@ -31,17 +47,13 @@ async function CheckShardsAsync() {
     {
         if(allShards[v] == "0")
         {
+            console.log(v + " is down");
             rabbitExchange.publish(JSON.stringify({
                 shard_id: v,
                 type: "reconnect"
             }));
-            await WaitAsync(5000);
         }
     }
-}
-
-async function WaitAsync(ms : number) {
-    await new Promise(resolve => setTimeout(resolve, ms));
 }
 
 MainAsync();
