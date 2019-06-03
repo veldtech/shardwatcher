@@ -47,7 +47,6 @@ async function CheckShardsAsync() {
     {
         if(allShards[v] == "0")
         {
-            console.log(v + " is down");
             rabbitExchange.publish(JSON.stringify({
                 shard_id: v,
                 type: "reconnect"
