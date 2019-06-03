@@ -1,0 +1,7 @@
+{
+    "amqpUrl": "amqp://localhost",
+    "redis": {
+        "url": "redis://localhost",
+        "password": "password"
+    }
+}
