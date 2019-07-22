@@ -4,7 +4,7 @@ import * as rabbitmq from "amqp-ts";
 import { promisify } from "util";
 import { config } from "dotenv";
 config({
-    path: "../.env",
+    path: ".env",
     encoding: "utf8"
 })
 
