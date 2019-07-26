@@ -2,11 +2,6 @@ import * as redis from "redis";
 import {CronJob} from "cron";
 import * as rabbitmq from "amqp-ts";
 import { promisify } from "util";
-import { config } from "dotenv";
-config({
-    path: ".env",
-    encoding: "utf8"
-})
 
 let redisClient : redis.RedisClient;
 let rabbitClient : rabbitmq.Connection;
